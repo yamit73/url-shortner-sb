@@ -35,8 +35,8 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request){
-        Optional<User> existingUser = userService.findByUsername(request.getUsername());
-        if(existingUser.isEmpty()) {
+        User existingUser = userService.findByUsername(request.getUsername());
+        if(existingUser == null) {
             User user = new User();
             user.setEmail(request.getEmail());
             user.setUsername(request.getUsername());

@@ -1,11 +1,16 @@
 package com.url.shortner.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.url.shortner.dto.common.ApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,9 +44,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
-        }catch (Exception e){
-            log.error("Exception while filtering token: {}", e);
+        } catch (ExpiredJwtException ex) {
+            log.error("Expired JWT token: {}", ex.getMessage());
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token has expired");
+            return;
+
+        } catch (RuntimeException ex) {
+            // Your exception is wrapped in RuntimeException
+            if (ex.getCause() instanceof MalformedJwtException ||
+                    ex.getCause() instanceof io.jsonwebtoken.MalformedJwtException) {
+                log.error("Malformed JWT token (wrapped): {}", ex.getMessage());
+                sendErrorResponse(response, HttpStatus.FORBIDDEN, "Invalid token format");
+                return;
+            }
+            throw ex; // Re-throw if it's a different RuntimeException
+
+        } catch (Exception ex) {
+            log.error("Exception while filtering token: {}", ex.getMessage(), ex);
+            sendErrorResponse(response, HttpStatus.FORBIDDEN, "Authentication failed");
+            return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        ObjectMapper mapper = new ObjectMapper();
+        response.getWriter().write(mapper.writeValueAsString(new ApiResponse(false, null, message)));
     }
 }

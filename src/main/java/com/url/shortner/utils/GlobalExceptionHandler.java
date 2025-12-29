@@ -6,6 +6,7 @@ import com.url.shortner.utils.exceptions.BadRequestException;
 import com.url.shortner.utils.exceptions.ForbiddenException;
 import com.url.shortner.utils.exceptions.ResourceNotFoundException;
 import com.url.shortner.utils.exceptions.UnauthorizedException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
