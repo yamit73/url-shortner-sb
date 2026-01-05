@@ -62,6 +62,7 @@ public class ClickEventService {
                         ClickEvent clickEvent = new ClickEvent();
                         clickEvent.setClickDate(message.getClickTimestamp());
                         clickEvent.setUrlMapping(urlMapping);
+                        clickEvent.setClientIp(message.getClientIp());
                         return clickEvent;
                     }
             ).toList();

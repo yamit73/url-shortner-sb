@@ -12,4 +12,5 @@ import java.time.LocalDateTime;
 public class ClickEventKafkaMessageDTO {
     private Long urlMappingId;
     private LocalDateTime clickTimestamp;
+    private String clientIp;
 }
