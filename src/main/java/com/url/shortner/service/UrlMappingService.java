@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -82,5 +80,9 @@ public class UrlMappingService {
         return clickEvents.stream().collect(Collectors.groupingBy(
                 clickEvent -> clickEvent.getClickDate().toLocalDate(), Collectors.counting()
         ));
+    }
+
+    public UrlMapping getOriginalUrlMappingByShortUrl(String shortUrl) {
+        return urlMappingRepository.findByShortUrl(shortUrl);
     }
 }
